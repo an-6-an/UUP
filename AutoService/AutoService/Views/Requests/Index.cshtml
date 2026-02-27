@@ -1,0 +1,204 @@
+﻿@model IEnumerable<AutoService.Models.Entities.Request>
+
+@{
+    ViewData["Title"] = "Заявки на ремонт";
+}
+
+<div class="fade-in">
+    <!-- Заголовок и кнопка добавления -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-list-task text-primary me-2"></i>@ViewData["Title"]
+        </h1>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Новая заявка
+        </a>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Статус</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">Все статусы</option>
+                        <option value="Новая заявка">Новая заявка</option>
+                        <option value="В процессе ремонта">В процессе ремонта</option>
+                        <option value="Готова к выдаче">Готова к выдаче</option>
+                        <option value="Отменена">Отменена</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Мастер</label>
+                    <select class="form-select" id="masterFilter">
+                        <option value="">Все мастера</option>
+                        @{
+                            var masters = Model.Where(r => r.Master != null).Select(r => r.Master).Distinct();
+                            foreach (var master in masters)
+                            {
+                                <option value="@master?.Id">@master?.FIO</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Поиск</label>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Поиск по описанию...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Дата с</label>
+                    <input type="date" class="form-control" id="dateFilter">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица заявок -->
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-table me-2"></i>Список заявок
+            <span class="badge bg-light text-dark ms-2">@Model.Count() заявок</span>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="requestsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Дата начала</th>
+                            <th>Автомобиль</th>
+                            <th>Проблема</th>
+                            <th>Статус</th>
+                            <th>Мастер</th>
+                            <th>Клиент</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td><strong>#@item.Id</strong></td>
+                                <td>@item.StartDate.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    <span class="badge bg-info text-dark">@item.Car?.CarType?.Name</span>
+                                    @item.Car?.CarModel
+                                </td>
+                                <td>
+                                    <div style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        @item.ProblemDescription
+                                    </div>
+                                </td>
+                                <td>
+                                    @switch (item.RequestStatus)
+                                    {
+                                        case "Новая заявка":
+                                            <span class="badge badge-new">Новая</span>
+                                            break;
+                                        case "В процессе ремонта":
+                                            <span class="badge badge-progress">В работе</span>
+                                            break;
+                                        case "Готова к выдаче":
+                                            <span class="badge badge-completed">Готова</span>
+                                            break;
+                                        case "Отменена":
+                                            <span class="badge badge-cancelled">Отменена</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary">@item.RequestStatus</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>@(item.Master?.FIO ?? "Не назначен")</td>
+                                <td>@item.Client?.FIO</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-info" title="Просмотр">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-warning" title="Редактировать">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Фильтрация таблицы
+            function filterTable() {
+                var status = $('#statusFilter').val();
+                var master = $('#masterFilter').val();
+                var search = $('#searchInput').val().toLowerCase();
+                var date = $('#dateFilter').val();
+
+                $('#requestsTable tbody tr').each(function() {
+                    var show = true;
+                    var row = $(this);
+
+                    // Фильтр по статусу
+                    if (status) {
+                        var rowStatus = row.find('td:eq(4) span').text().trim();
+                        if (!rowStatus.includes(status)) {
+                            show = false;
+                        }
+                    }
+
+                    // Фильтр по мастеру
+                    if (master && show) {
+                        var masterCell = row.find('td:eq(5)').text().trim();
+                        var masterId = masterCell === "Не назначен" ? "" : masterCell; // Упрощенно
+                        if (!masterCell.includes($('#masterFilter option:selected').text())) {
+                            show = false;
+                        }
+                    }
+
+                    // Поиск по тексту
+                    if (search && show) {
+                        var text = row.text().toLowerCase();
+                        if (!text.includes(search)) {
+                            show = false;
+                        }
+                    }
+
+                    // Фильтр по дате
+                    if (date && show) {
+                        var rowDate = row.find('td:eq(1)').text().trim();
+                        // Преобразуем даты для сравнения
+                        var filterDate = new Date(date);
+                        var rowDateObj = parseDate(rowDate);
+
+                        if (rowDateObj.toDateString() !== filterDate.toDateString()) {
+                            show = false;
+                        }
+                    }
+
+                    row.toggle(show);
+                });
+            }
+
+            // Вспомогательная функция для парсинга даты
+            function parseDate(dateStr) {
+                var parts = dateStr.split('.');
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+
+            // Привязка событий
+            $('#statusFilter, #masterFilter, #searchInput, #dateFilter').on('change keyup', filterTable);
+
+            // Кнопки действий
+            $('.btn-info, .btn-warning').tooltip();
+        });
+    </script>
+}

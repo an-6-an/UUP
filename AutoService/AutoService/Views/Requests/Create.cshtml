@@ -1,0 +1,213 @@
+﻿@model AutoService.Models.Entities.Request
+
+@{
+    ViewData["Title"] = "Новая заявка";
+}
+
+<div class="fade-in">
+    <!-- Навигация -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-action="Index">Заявки</a>
+            </li>
+            <li class="breadcrumb-item active">Новая заявка</li>
+        </ol>
+    </nav>
+
+    <!-- Заголовок -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-plus-circle text-primary me-2"></i>@ViewData["Title"]
+        </h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-pencil-square me-2"></i>Заполните информацию о заявке
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <!-- Дата начала -->
+                        <div class="mb-3">
+                            <label asp-for="StartDate" class="form-label">
+                                <i class="bi bi-calendar me-1"></i>@Html.DisplayNameFor(m => m.StartDate)
+                            </label>
+                            <input asp-for="StartDate" class="form-control" type="date"
+                                   value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Клиент -->
+                        <div class="mb-3">
+                            <label asp-for="ClientId" class="form-label">
+                                <i class="bi bi-person me-1"></i>@Html.DisplayNameFor(m => m.ClientId)
+                            </label>
+                            <select asp-for="ClientId" class="form-select" asp-items="ViewBag.Clients">
+                                <option value="">-- Выберите клиента --</option>
+                            </select>
+                            <span asp-validation-for="ClientId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Автомобиль -->
+                        <div class="mb-3">
+                            <label asp-for="CarId" class="form-label">
+                                <i class="bi bi-car-front me-1"></i>@Html.DisplayNameFor(m => m.CarId)
+                            </label>
+                            <select asp-for="CarId" class="form-select" asp-items="ViewBag.Cars">
+                                <option value="">-- Выберите автомобиль --</option>
+                            </select>
+                            <span asp-validation-for="CarId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Описание проблемы -->
+                        <div class="mb-3">
+                            <label asp-for="ProblemDescription" class="form-label">
+                                <i class="bi bi-chat-dots me-1"></i>@Html.DisplayNameFor(m => m.ProblemDescription)
+                            </label>
+                            <textarea asp-for="ProblemDescription" class="form-control" rows="4"
+                                      placeholder="Опишите проблему подробно..."></textarea>
+                            <span asp-validation-for="ProblemDescription" class="text-danger"></span>
+                        </div>
+
+                        <!-- Статус -->
+                        <div class="mb-3">
+                            <label asp-for="RequestStatus" class="form-label">
+                                <i class="bi bi-tag me-1"></i>@Html.DisplayNameFor(m => m.RequestStatus)
+                            </label>
+                            <select asp-for="RequestStatus" class="form-select">
+                                <option value="Новая заявка" selected>Новая заявка</option>
+                                <option value="В процессе ремонта">В процессе ремонта</option>
+                                <option value="Готова к выдаче">Готова к выдаче</option>
+                                <option value="Отменена">Отменена</option>
+                            </select>
+                            <span asp-validation-for="RequestStatus" class="text-danger"></span>
+                        </div>
+
+                        <!-- Мастер -->
+                        <div class="mb-3">
+                            <label asp-for="MasterId" class="form-label">
+                                <i class="bi bi-tools me-1"></i>@Html.DisplayNameFor(m => m.MasterId)
+                            </label>
+                            <select asp-for="MasterId" class="form-select" asp-items="ViewBag.Mechanics">
+                                <option value="">-- Не назначать --</option>
+                            </select>
+                            <span asp-validation-for="MasterId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Запчасти (опционально) -->
+                        <div class="mb-3">
+                            <label asp-for="RepairParts" class="form-label">
+                                <i class="bi bi-gear me-1"></i>@Html.DisplayNameFor(m => m.RepairParts)
+                            </label>
+                            <textarea asp-for="RepairParts" class="form-control" rows="3"
+                                      placeholder="Необходимые запчасти (если есть)"></textarea>
+                            <span asp-validation-for="RepairParts" class="text-danger"></span>
+                        </div>
+
+                        <!-- Дата завершения (опционально) -->
+                        <div class="mb-3">
+                            <label asp-for="CompletionDate" class="form-label">
+                                <i class="bi bi-calendar-check me-1"></i>@Html.DisplayNameFor(m => m.CompletionDate)
+                            </label>
+                            <input asp-for="CompletionDate" class="form-control" type="date" />
+                            <span asp-validation-for="CompletionDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Кнопки -->
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Назад
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i>Создать заявку
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Подсказки -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-info-circle me-2"></i>Подсказка
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Как создать заявку?</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Выберите существующего клиента
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Выберите автомобиль клиента
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Подробно опишите проблему
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            При необходимости назначьте мастера
+                        </li>
+                    </ul>
+                    <hr />
+                    <p class="text-muted small">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Все поля, отмеченные звездочкой, обязательны для заполнения.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Автоматическое заполнение даты
+            if (!$('#StartDate').val()) {
+                var today = new Date().toISOString().split('T')[0];
+                $('#StartDate').val(today);
+            }
+
+            // Валидация на стороне клиента
+            $('form').submit(function(e) {
+                var clientId = $('#ClientId').val();
+                var carId = $('#CarId').val();
+                var problemDesc = $('#ProblemDescription').val();
+
+                if (!clientId) {
+                    toastr.error('Выберите клиента');
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (!carId) {
+                    toastr.error('Выберите автомобиль');
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (!problemDesc) {
+                    toastr.error('Опишите проблему');
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
+}

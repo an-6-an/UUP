@@ -1,0 +1,199 @@
+﻿@model AutoService.Models.Entities.Request
+
+@{
+    ViewData["Title"] = $"Заявка #{Model.Id}";
+}
+
+<div class="fade-in">
+    <!-- Навигация -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-action="Index">Заявки</a>
+            </li>
+            <li class="breadcrumb-item active">Заявка #@Model.Id</li>
+        </ol>
+    </nav>
+
+    <!-- Заголовок -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-file-text text-primary me-2"></i>Заявка #@Model.Id
+        </h1>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="bi bi-pencil me-2"></i>Редактировать
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Назад
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Основная информация -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-info-circle me-2"></i>Информация о заявке
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">ID заявки:</dt>
+                        <dd class="col-sm-9">@Model.Id</dd>
+
+                        <dt class="col-sm-3">Дата начала:</dt>
+                        <dd class="col-sm-9">@Model.StartDate.ToString("dd.MM.yyyy")</dd>
+
+                        <dt class="col-sm-3">Статус:</dt>
+                        <dd class="col-sm-9">
+                            @switch (Model.RequestStatus)
+                            {
+                                case "Новая заявка":
+                                    <span class="badge badge-new">Новая заявка</span>
+                                    break;
+                                case "В процессе ремонта":
+                                    <span class="badge badge-progress">В процессе ремонта</span>
+                                    break;
+                                case "Готова к выдаче":
+                                    <span class="badge badge-completed">Готова к выдаче</span>
+                                    break;
+                                case "Отменена":
+                                    <span class="badge badge-cancelled">Отменена</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">@Model.RequestStatus</span>
+                                    break;
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Описание проблемы:</dt>
+                        <dd class="col-sm-9">
+                            <div class="p-3 bg-light rounded">
+                                @Model.ProblemDescription
+                            </div>
+                        </dd>
+
+                        @if (!string.IsNullOrEmpty(Model.RepairParts))
+                        {
+                            <dt class="col-sm-3">Запчасти:</dt>
+                            <dd class="col-sm-9">
+                                <div class="p-3 bg-light rounded">
+                                    @Model.RepairParts
+                                </div>
+                            </dd>
+                        }
+
+                        <dt class="col-sm-3">Дата завершения:</dt>
+                        <dd class="col-sm-9">
+                            @(Model.CompletionDate?.ToString("dd.MM.yyyy") ?? "Не завершена")
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Комментарии -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-chat-dots me-2"></i>Комментарии механиков
+                </div>
+                <div class="card-body">
+                    @if (Model.Comments != null && Model.Comments.Any())
+                    {
+                        <div class="comments-list">
+                            @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedAt))
+                            {
+                                <div class="comment-item mb-3 p-3 bg-light rounded">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <strong>
+                                            <i class="bi bi-person-circle me-1"></i>
+                                            @comment.Master?.FIO
+                                        </strong>
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock me-1"></i>
+                                            @comment.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                                        </small>
+                                    </div>
+                                    <p class="mt-2 mb-0">@comment.Message</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-3">
+                            <i class="bi bi-chat me-2"></i>Нет комментариев
+                        </p>
+                    }
+
+                    <!-- Форма добавления комментария -->
+                    <form asp-action="AddComment" method="post" class="mt-4">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="requestId" value="@Model.Id" />
+                        <input type="hidden" name="masterId" value="2" /> <!-- Временно ID текущего пользователя -->
+
+                        <div class="input-group">
+                            <input type="text" name="message" class="form-control"
+                                   placeholder="Введите комментарий..." required />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send me-2"></i>Отправить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Боковая панель с информацией -->
+        <div class="col-md-4">
+            <!-- Информация о клиенте -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-person me-2"></i>Клиент
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.Client?.FIO</h5>
+                    <p class="card-text">
+                        <i class="bi bi-telephone me-2"></i>@Model.Client?.Phone<br />
+                        <i class="bi bi-envelope me-2"></i>@Model.Client?.Login
+                    </p>
+                </div>
+            </div>
+
+            <!-- Информация об автомобиле -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-car-front me-2"></i>Автомобиль
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.Car?.CarModel</h5>
+                    <p class="card-text">
+                        <span class="badge bg-info text-dark">@Model.Car?.CarType?.Name</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Информация о мастере -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-tools me-2"></i>Назначенный мастер
+                </div>
+                <div class="card-body">
+                    @if (Model.Master != null)
+                    {
+                        <h5 class="card-title">@Model.Master.FIO</h5>
+                        <p class="card-text">
+                            <i class="bi bi-telephone me-2"></i>@Model.Master.Phone
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-muted">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Мастер не назначен
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

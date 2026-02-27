@@ -16,8 +16,15 @@ namespace AutoService.Models.Entities
         [StringLength(100)]
         public string CarModel { get; set; } = string.Empty; // Вместо Brand + Model
 
+        // Внешний ключ для владельца (если нужно)
+        public int? OwnerId { get; set; }
+
+        // Навигационные свойства
         [ForeignKey("CarTypeId")]
         public virtual CarType CarType { get; set; } = null!;
+
+        [ForeignKey("OwnerId")]
+        public virtual User? Owner { get; set; }
 
         public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
     }

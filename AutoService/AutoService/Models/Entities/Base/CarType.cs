@@ -12,6 +12,7 @@ namespace AutoService.Models.Entities
         [StringLength(50)]
         public string Name { get; set; } = string.Empty; // Легковая, Грузовая и т.д.
 
-        // В этой модели больше нет Description, только Name
+        // Добавляем навигационное свойство
+        public virtual ICollection<Car> Cars { get; set; } = new List<Car>();
     }
 }

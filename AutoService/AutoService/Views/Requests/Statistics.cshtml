@@ -1,0 +1,242 @@
+﻿@model AutoService.Models.ViewModels.StatisticsViewModel
+
+@{
+    ViewData["Title"] = "Статистика";
+}
+
+<div class="fade-in">
+    <!-- Заголовок -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">
+            <i class="bi bi-bar-chart text-primary me-2"></i>@ViewData["Title"]
+        </h1>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Назад к заявкам
+        </a>
+    </div>
+
+    <!-- Карточки статистики -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Всего заявок</h6>
+                            <h2 class="mb-0">@Model.TotalRequests</h2>
+                        </div>
+                        <i class="bi bi-list-task fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">В работе</h6>
+                            <h2 class="mb-0">@Model.InProgressRequests</h2>
+                        </div>
+                        <i class="bi bi-gear fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Завершено</h6>
+                            <h2 class="mb-0">@Model.CompletedRequests</h2>
+                        </div>
+                        <i class="bi bi-check-circle fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Среднее время</h6>
+                            <h2 class="mb-0">@Model.AverageCompletionDays.ToString("F1") дней</h2>
+                        </div>
+                        <i class="bi bi-clock-history fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Статусы заявок -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-pie-chart me-2"></i>Распределение по статусам
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Типы неисправностей -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-bar-chart me-2"></i>По типам автомобилей
+                </div>
+                <div class="card-body">
+                    <canvas id="carTypeChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица статистики -->
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-table me-2"></i>Детальная статистика
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Показатель</th>
+                        <th>Количество</th>
+                        <th>Процент</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Новые заявки</td>
+                        <td>@Model.NewRequests</td>
+                        <td>@((Model.TotalRequests > 0 ? (Model.NewRequests * 100.0 / Model.TotalRequests) : 0).ToString("F1"))%</td>
+                    </tr>
+                    <tr>
+                        <td>В процессе ремонта</td>
+                        <td>@Model.InProgressRequests</td>
+                        <td>@((Model.TotalRequests > 0 ? (Model.InProgressRequests * 100.0 / Model.TotalRequests) : 0).ToString("F1"))%</td>
+                    </tr>
+                    <tr>
+                        <td>Готовы к выдаче</td>
+                        <td>@Model.CompletedRequests</td>
+                        <td>@((Model.TotalRequests > 0 ? (Model.CompletedRequests * 100.0 / Model.TotalRequests) : 0).ToString("F1"))%</td>
+                    </tr>
+                    <tr>
+                        <td>Отменены</td>
+                        <td>@Model.CancelledRequests</td>
+                        <td>@((Model.TotalRequests > 0 ? (Model.CancelledRequests * 100.0 / Model.TotalRequests) : 0).ToString("F1"))%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr />
+
+            <h5 class="mt-4">Статистика по типам автомобилей</h5>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Тип автомобиля</th>
+                        <th>Количество заявок</th>
+                        <th>Процент</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ProblemsByType)
+                    {
+                        <tr>
+                            <td>@item.CarType</td>
+                            <td>@item.Count</td>
+                            <td>@((Model.TotalRequests > 0 ? (item.Count * 100.0 / Model.TotalRequests) : 0).ToString("F1"))%</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            // График статусов
+            var ctx1 = document.getElementById('statusChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Новые', 'В работе', 'Готовы', 'Отменены'],
+                    datasets: [{
+                        data: [@Model.NewRequests, @Model.InProgressRequests, @Model.CompletedRequests, @Model.CancelledRequests],
+                        backgroundColor: [
+                            '#17a2b8',
+                            '#ffc107',
+                            '#28a745',
+                            '#dc3545'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // График по типам автомобилей
+            var ctx2 = document.getElementById('carTypeChart').getContext('2d');
+
+            // Ручное формирование массивов без Newtonsoft.Json
+            var carTypes = [
+        @foreach (var item in Model.ProblemsByType)
+        {
+            @:'@item.CarType',
+        }
+            ];
+
+            var carCounts = [
+        @foreach (var item in Model.ProblemsByType)
+        {
+            @:@item.Count,
+        }
+            ];
+
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: carTypes,
+                    datasets: [{
+                        label: 'Количество заявок',
+                        data: carCounts,
+                        backgroundColor: '#3498db',
+                        borderColor: '#2980b9',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            stepSize: 1
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
