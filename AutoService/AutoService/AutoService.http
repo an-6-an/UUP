@@ -1,4 +1,4 @@
-@AutoService_HostAddress = http://localhost:5075
+@AutoService_HostAddress = http://localhost:5062
 
 GET {{AutoService_HostAddress}}/weatherforecast/
 Accept: application/json

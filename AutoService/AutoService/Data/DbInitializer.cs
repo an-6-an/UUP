@@ -29,16 +29,16 @@ namespace AutoService.Data
             // Создаем пользователей
             var users = new User[]
             {
-                new User { FIO = "Белов Александр Давидович", Phone = "89210563128", Login = "login1", Password = "pass1", Type = "Менеджер" },
-                new User { FIO = "Харитонова Мария Павловна", Phone = "89535078985", Login = "login2", Password = "pass2", Type = "Автомеханик" },
-                new User { FIO = "Марков Давид Иванович", Phone = "89210673849", Login = "login3", Password = "pass3", Type = "Автомеханик" },
-                new User { FIO = "Громова Анна Семёновна", Phone = "89990563748", Login = "login4", Password = "pass4", Type = "Оператор" },
-                new User { FIO = "Карташова Мария Данииловна", Phone = "89994563847", Login = "login5", Password = "pass5", Type = "Оператор" },
-                new User { FIO = "Касаткин Егор Львович", Phone = "89219567849", Login = "login11", Password = "pass11", Type = "Заказчик" },
-                new User { FIO = "Ильина Тамара Даниловна", Phone = "89219567841", Login = "login12", Password = "pass12", Type = "Заказчик" },
-                new User { FIO = "Елисеева Юлиана Алексеевна", Phone = "89219567842", Login = "login13", Password = "pass13", Type = "Заказчик" },
-                new User { FIO = "Никифорова Алиса Тимофеевна", Phone = "89219567843", Login = "login14", Password = "pass14", Type = "Заказчик" },
-                new User { FIO = "Васильев Али Евгеньевич", Phone = "89219567844", Login = "login15", Password = "pass15", Type = "Автомеханик" }
+    new User { FIO = "Белов Александр Давидович", Phone = "89210563128", Login = "login1", Password = "pass1", Type = "Менеджер", CreatedAt = DateTime.Now },
+    new User { FIO = "Харитонова Мария Павловна", Phone = "89535078985", Login = "login2", Password = "pass2", Type = "Автомеханик", CreatedAt = DateTime.Now },
+    new User { FIO = "Марков Давид Иванович", Phone = "89210673849", Login = "login3", Password = "pass3", Type = "Автомеханик", CreatedAt = DateTime.Now },
+    new User { FIO = "Громова Анна Семёновна", Phone = "89990563748", Login = "login4", Password = "pass4", Type = "Оператор", CreatedAt = DateTime.Now },
+    new User { FIO = "Карташова Мария Данииловна", Phone = "89994563847", Login = "login5", Password = "pass5", Type = "Оператор", CreatedAt = DateTime.Now },
+    new User { FIO = "Касаткин Егор Львович", Phone = "89219567849", Login = "login11", Password = "pass11", Type = "Заказчик", CreatedAt = DateTime.Now },
+    new User { FIO = "Ильина Тамара Даниловна", Phone = "89219567841", Login = "login12", Password = "pass12", Type = "Заказчик", CreatedAt = DateTime.Now },
+    new User { FIO = "Елисеева Юлиана Алексеевна", Phone = "89219567842", Login = "login13", Password = "pass13", Type = "Заказчик", CreatedAt = DateTime.Now },
+    new User { FIO = "Никифорова Алиса Тимофеевна", Phone = "89219567843", Login = "login14", Password = "pass14", Type = "Заказчик", CreatedAt = DateTime.Now },
+    new User { FIO = "Васильев Али Евгеньевич", Phone = "89219567844", Login = "login15", Password = "pass15", Type = "Автомеханик", CreatedAt = DateTime.Now }
             };
             await context.Users.AddRangeAsync(users);
             await context.SaveChangesAsync();

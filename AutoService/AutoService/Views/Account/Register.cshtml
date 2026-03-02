@@ -1,0 +1,110 @@
+﻿@model AutoService.Models.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Регистрация";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-success text-white text-center py-4">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-plus me-2"></i>Регистрация нового пользователя
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Форма регистрации -->
+                    <form asp-action="Register" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <!-- Вывод общих ошибок -->
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <!-- ФИО -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="FIO" class="form-control" placeholder="ФИО" />
+                            <label asp-for="FIO">
+                                <i class="bi bi-person me-2"></i>@Html.DisplayNameFor(m => m.FIO)
+                            </label>
+                            <span asp-validation-for="FIO" class="text-danger"></span>
+                        </div>
+
+                        <!-- Телефон -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="Phone" class="form-control" placeholder="Телефон" />
+                            <label asp-for="Phone">
+                                <i class="bi bi-telephone me-2"></i>@Html.DisplayNameFor(m => m.Phone)
+                            </label>
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                            <small class="text-muted">Формат: 8XXXXXXXXXX</small>
+                        </div>
+
+                        <!-- Логин -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="Login" class="form-control" placeholder="Логин" />
+                            <label asp-for="Login">
+                                <i class="bi bi-person-badge me-2"></i>@Html.DisplayNameFor(m => m.Login)
+                            </label>
+                            <span asp-validation-for="Login" class="text-danger"></span>
+                        </div>
+
+                        <!-- Пароль -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="Password" class="form-control" placeholder="Пароль" type="password" />
+                            <label asp-for="Password">
+                                <i class="bi bi-lock me-2"></i>@Html.DisplayNameFor(m => m.Password)
+                            </label>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <!-- Подтверждение пароля -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Подтверждение" type="password" />
+                            <label asp-for="ConfirmPassword">
+                                <i class="bi bi-lock-fill me-2"></i>@Html.DisplayNameFor(m => m.ConfirmPassword)
+                            </label>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <!-- Тип пользователя -->
+                        <div class="mb-3">
+                            <label asp-for="UserType" class="form-label">
+                                <i class="bi bi-person-workspace me-2"></i>@Html.DisplayNameFor(m => m.UserType)
+                            </label>
+                            <select asp-for="UserType" class="form-select">
+                                <option value="Заказчик">Заказчик</option>
+                                <option value="Автомеханик">Автомеханик</option>
+                            </select>
+                            <span asp-validation-for="UserType" class="text-danger"></span>
+                            <small class="text-muted">Регистрация как менеджер или оператор доступна только через администратора</small>
+                        </div>
+
+                        <!-- Кнопки -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>Зарегистрироваться
+                            </button>
+
+                            <div class="text-center mt-3">
+                                <p class="mb-0">
+                                    Уже есть аккаунт?
+                                    <a asp-action="Login" class="text-decoration-none">
+                                        Войти
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

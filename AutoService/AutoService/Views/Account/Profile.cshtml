@@ -1,0 +1,115 @@
+﻿@model AutoService.Models.ViewModels.UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Мой профиль";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-circle me-2"></i>@ViewData["Title"]
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Уведомления -->
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <!-- Форма профиля -->
+                    <form asp-action="Profile" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="Login" />
+                        <input type="hidden" asp-for="UserType" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <!-- ФИО -->
+                        <div class="mb-3">
+                            <label asp-for="FIO" class="form-label">
+                                <i class="bi bi-person me-2"></i>@Html.DisplayNameFor(m => m.FIO)
+                            </label>
+                            <input asp-for="FIO" class="form-control" />
+                            <span asp-validation-for="FIO" class="text-danger"></span>
+                        </div>
+
+                        <!-- Телефон -->
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label">
+                                <i class="bi bi-telephone me-2"></i>@Html.DisplayNameFor(m => m.Phone)
+                            </label>
+                            <input asp-for="Phone" class="form-control" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+
+                        <!-- Логин (только для чтения) -->
+                        <div class="mb-3">
+                            <label asp-for="Login" class="form-label">
+                                <i class="bi bi-person-badge me-2"></i>@Html.DisplayNameFor(m => m.Login)
+                            </label>
+                            <input asp-for="Login" class="form-control" readonly disabled />
+                        </div>
+
+                        <!-- Тип пользователя (только для чтения) -->
+                        <div class="mb-3">
+                            <label asp-for="UserType" class="form-label">
+                                <i class="bi bi-person-workspace me-2"></i>@Html.DisplayNameFor(m => m.UserType)
+                            </label>
+                            <input asp-for="UserType" class="form-control" readonly disabled />
+                        </div>
+
+                        <!-- Разделитель -->
+                        <hr class="my-4" />
+                        <h5 class="mb-3">
+                            <i class="bi bi-key me-2"></i>Смена пароля
+                        </h5>
+
+                        <!-- Новый пароль -->
+                        <div class="mb-3">
+                            <label asp-for="NewPassword" class="form-label">
+                                @Html.DisplayNameFor(m => m.NewPassword)
+                            </label>
+                            <input asp-for="NewPassword" class="form-control" type="password" />
+                            <span asp-validation-for="NewPassword" class="text-danger"></span>
+                            <small class="text-muted">Оставьте пустым, если не хотите менять пароль</small>
+                        </div>
+
+                        <!-- Подтверждение пароля -->
+                        <div class="mb-3">
+                            <label asp-for="ConfirmPassword" class="form-label">
+                                @Html.DisplayNameFor(m => m.ConfirmPassword)
+                            </label>
+                            <input asp-for="ConfirmPassword" class="form-control" type="password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <!-- Кнопки -->
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" asp-controller="Requests" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Назад
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i>Сохранить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
